@@ -10,7 +10,7 @@
 	:license: MIT
 """
 
-import shaman
+from . import shaman
 import sys, os
 import csv, json
 
@@ -18,7 +18,7 @@ import csv, json
 def run() :
 	if len(sys.argv) != 3 :
 		# Exception handling on starting program
-		print('Usage: "python trainer.py <code_bunch.csv> <result.json>"')
+		print('Usage: "shaman-trainer <code_bunch.csv> <result.json>"')
 		sys.exit(-1)
 
 

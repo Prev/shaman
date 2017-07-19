@@ -34,6 +34,9 @@ class Shaman :
 	def __init__(self, trained_set) :
 		""" Shaman constructor
 		"""
+		if hasattr(trained_set, 'read') :
+			trained_set = json.loads(trained_set.read())
+
 		self.trained_set = trained_set
 
 

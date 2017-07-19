@@ -12,7 +12,7 @@
 	:license: MIT
 """
 
-import shaman
+from . import shaman
 import sys, os
 import csv, json
 import argparse
@@ -32,7 +32,7 @@ def run() :
 		test_with_bunch(args.bunch)
 
 	else:
-		print('to see help, COMMAND "python tester.py --help"')
+		print('to see help, COMMAND "shaman-tester --help"')
 		sys.exit()
 
 
