@@ -110,7 +110,7 @@ def test_with_bunch(filename) :
 
 	
 	print("------------------------------------------------")
-	print("Accuracy: %.2lf%% (Correct: %d / Valid Data: %d)" % (correct/totals*100, totals, correct))
+	print("Accuracy: %.2lf%% (Correct: %d / Valid Data: %d)" % (correct/totals*100, correct, totals))
 	print("------------------------------------------------")
 	
 	results = sorted(results.items(), key=lambda x: x[1][0], reverse=True)

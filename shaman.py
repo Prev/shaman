@@ -40,14 +40,15 @@ class Shaman :
 	def detect(self, code) :
 		""" Detect language with code
 		"""
+		
 		keywords = KeywordFetcher.fetch( code )
 		probabilities = {}
 
 		for keyword in keywords :
-			if keyword not in self.trained_set :
+			if keyword not in self.trained_set['keywords'] :
 				continue
 
-			data = self.trained_set[keyword]
+			data = self.trained_set['keywords'][keyword]
 			p_avg = sum(data.values()) / len(data) # Average probability of all languages
 
 			for language, probability in data.items() :
@@ -55,6 +56,26 @@ class Shaman :
 				p = probability / p_avg
 
 				probabilities[ language ] = probabilities.get(language, 0) + math.log(1 + p)
+
+
+
+		for pattern, data in self.trained_set['patterns'].items() :
+			# print('pattern ("%s")' % pattern)
+
+			matcher = PatternMatcher(pattern)
+			p0 = matcher.getratio(code)
+			# print(p0)
+
+			for language, p_avg in data.items() :
+				if language not in probabilities :
+					continue
+
+				p = 1 - abs(p_avg - p0)
+				probabilities[ language ] *= p
+				
+				# print('%s: %s' % (language, p_avg))
+
+			# print('---------')
 
 
 		# Convert `log` operated probability to percentile
@@ -129,3 +150,30 @@ class KeywordFetcher :
 
 		return removed_string
 
+
+
+class PatternMatcher :
+
+	PATTERNS = [
+		r'\([^)]*\)\s*{[^}]*}', # c-style
+		r'<\\?.+>', #markup
+		r'([a-zA-Z0-9-_]+)\s*:\s*.*\s*;', #css
+		#r'{(\s*([a-zA-Z0-9-_]+)\s*:\s*([a-zA-Z0-9-_]*)\s*;\s*)+}', #css
+		r'def\s+([^(]+)\s*\([^)]*\)\s*:', #python
+	]
+
+	def __init__(self, pattern) :
+		""" Pattern Matcher Constructor
+		:param pattern: regex pattern string
+		"""
+		self.prog = re.compile(pattern)
+
+
+	def getratio(self, code) :
+		""" Get ratio of code and pattern matched
+		"""
+		if len(code) == 0 : return 0
+
+		code_replaced = self.prog.sub('', code)
+		return (len(code) - len(code_replaced)) / len(code)
+	
