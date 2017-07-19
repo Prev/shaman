@@ -8,7 +8,7 @@ When you input `code`, Shaman detect its `language`
 
 ## Accuracy
 Now 80%  
-![Accuracy](https://raw.githubusercontent.com/Prev/shaman/master/resources/accuracy.png)
+<img src="https://raw.githubusercontent.com/Prev/shaman/master/resources/accuracy.png" width="500" alt="Accuracy">
 
 
 ## Supporting languages
