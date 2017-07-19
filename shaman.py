@@ -155,11 +155,13 @@ class KeywordFetcher :
 class PatternMatcher :
 
 	PATTERNS = [
-		r'\([^)]*\)\s*{[^}]*}', # c-style
-		r'<\\?.+>', #markup
+		r'(<.+>[^<]*<\/.+>)|<\\?.+>', #markup
 		r'([a-zA-Z0-9-_]+)\s*:\s*.*\s*;', #css
-		#r'{(\s*([a-zA-Z0-9-_]+)\s*:\s*([a-zA-Z0-9-_]*)\s*;\s*)+}', #css
 		r'def\s+([^(]+)\s*\([^)]*\)\s*:', #python
+		r'function\s+\([^)]*\)\s*{[^}]*}', #js-style function
+		r'var\s+[a-zA-Z0-9_$]+', #js-style var
+		r'\$[a-zA-Z0-9_$]+', #sigil style var
+		r'\([^)]*\)\s*{[^}]*}', # c-style block
 	]
 
 	def __init__(self, pattern) :
