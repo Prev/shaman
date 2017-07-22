@@ -1,1 +1,2 @@
 include shamanld/data/trained.json
+recursive-include data *

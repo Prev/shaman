@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
 	name = 'shamanld',
 	packages = ['shamanld'],
-	version = '0.1',
+	version = '0.12',
 	description = 'Programming Language Detector',
 	license = 'MIT',
 
@@ -14,12 +14,8 @@ setup(
 	url = 'https://github.com/Prev/shaman',
 	keywords = ['language-detector', 'language', 'detector'],
 
-	install_requires=[
-	],
-
-
-	classifiers=(
-	),
+	package_data={'shamanld': ['*.json']},
+	include_package_data=True,
 
 	entry_points={
 		'console_scripts': [
