@@ -108,7 +108,6 @@ def test_with_bunch(filename) :
 		results[ language ][2] = results[ language ][0] / results[ language ][1]
 
 
-	
 	print("------------------------------------------------")
 	print("Accuracy: %.2lf%% (Correct: %d / Valid Data: %d)" % (correct/totals*100, correct, totals))
 	print("------------------------------------------------")

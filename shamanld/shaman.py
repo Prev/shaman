@@ -61,14 +61,10 @@ class Shaman :
 				probabilities[ language ] = probabilities.get(language, 0) + math.log(1 + p)
 
 
-
 		for pattern, data in self.trained_set['patterns'].items() :
-			# print('pattern ("%s")' % pattern)
-
 			matcher = PatternMatcher(pattern)
 			p0 = matcher.getratio(code)
-			# print(p0)
-
+			
 			for language, p_avg in data.items() :
 				if language not in probabilities :
 					continue
@@ -76,10 +72,6 @@ class Shaman :
 				p = 1 - abs(p_avg - p0)
 				probabilities[ language ] *= p
 				
-				# print('%s: %s' % (language, p_avg))
-
-			# print('---------')
-
 
 		# Convert `log` operated probability to percentile
 		sum_val = 0
@@ -90,8 +82,6 @@ class Shaman :
 			probabilities[language] = math.pow(math.e / 2, p) / sum_val * 100
 
 		return sorted(probabilities.items(), key=lambda a: a[1], reverse=True)
-
-
 
 
 class KeywordFetcher :

@@ -33,7 +33,6 @@ def run() :
 		sys.exit(-1)
 
 
-
 	# Read CSV file
 	csv.field_size_limit(sys.maxsize) # Set CSV limit to sys.maxsize
 	filedata = []
