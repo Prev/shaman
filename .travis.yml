@@ -10,7 +10,3 @@ install:
 
 script:
   - python -m pytest tests
-
-notifications:
-  email: false
-  slack: prevlab:duJn4BAET8sPRW9wpKVpnY97
