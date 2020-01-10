@@ -10,9 +10,12 @@
 	:license: MIT
 """
 
-from . import shaman
+#from . import shaman
+import shaman
 import sys, os
 import csv, json
+
+ZIP_RESULT = True
 
 
 def run() :
@@ -89,9 +92,26 @@ def fetch_keywords(codedata) :
 	for language in tmp :
 		for keyword, count in tmp[ language ].items() :	
 			if keyword not in ret :
-				ret[ keyword ] = {}
+				ret[keyword] = {}
 
-			ret[ keyword ][ language ] = (count / language_counts[ language ]) # Probability
+			ret[keyword][language] = (count / language_counts[ language ]) # Probability
+
+			if ZIP_RESULT:
+				ret[keyword]['$$total'] = ret[keyword].get('$$total', 0) + count
+
+	if ZIP_RESULT:
+		# If ZIP_RESULT is true, check total counts of the keyword,
+		# and ignore if count is too small (under 30)
+		keywords2remove = []
+
+		for keyword in ret:
+			if ret[keyword]['$$total'] < 30:
+				keywords2remove.append(keyword)
+				continue
+			del ret[keyword]['$$total']
+
+		for keyword in keywords2remove:
+			del ret[keyword]
 
 	print('Fetch keyword completed        ')
 	return ret
