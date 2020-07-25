@@ -6,4 +6,4 @@
 	:author: Prev(prevdev@gmail.com)
 	:license: MIT
 """
-from .shaman import Shaman
+from .shaman import Shaman, LANGUAGES_SUPPORTED

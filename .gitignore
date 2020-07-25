@@ -8,5 +8,4 @@ __pycache__
 *.egg
 build/
 dist/
-
-*.csv
+local_data/

@@ -1,121 +1,105 @@
 """
-	shaman/trainer
-	-----------------
-	Train shaman by code bunch
+Train Shaman with CSV file ("language, code" foramt)
 
-	Usage: 
-		python trainer.py <code_bunch.csv> <result.json>
+Usage:
+	python trainer.py <test_set.csv> [--model-path <output_model_path>] [--light]
 
-	:author: Prev(prevdev@gmail.com)
-	:license: MIT
+:author: Prev(prevdev@gmail.com)
+:license: MIT
 """
-
-#from . import shaman
 import shaman
-import sys, os
-import csv, json
+import argparse
+import sys
+import os
+import csv
+import json
+import gzip
 
-ZIP_RESULT = True
+def main() :
+	aparser = argparse.ArgumentParser()
+	aparser.add_argument('path', type=str, help='Path of the CSV file for training ("language, code" foramt)')
+	aparser.add_argument('--model-path', type=str, help='Output path of the trained model file', default='model.json.gz')
+	aparser.add_argument('--light', type=bool, help='Make light-weighted model file', default=False, const=True, nargs='?')
+	args = aparser.parse_args()
 
-
-def run() :
-	if len(sys.argv) != 3 :
-		# Exception handling on starting program
-		print('Usage: "shaman-trainer <code_bunch.csv> <result.json>"')
+	if not os.path.isfile(args.path):
+		print('"%s" is not a file' % args.path)
 		sys.exit(-1)
 
-
-	# Args
-	codebunch_file = sys.argv[1]
-	result_file = sys.argv[2]
-
-
-	if not os.path.isfile(codebunch_file) :
-		# Exception handling of <code bunch> file
-		print('"%s" is not a file' % codebunch_file)
-		sys.exit(-1)
-
-
-	# Read CSV file
 	csv.field_size_limit(sys.maxsize) # Set CSV limit to sys.maxsize
 	filedata = []
 
 	print('Load CSV file')
-
-	with open(codebunch_file) as csvfile :
+	with open(args.path) as csvfile:
 		reader = csv.reader(csvfile, delimiter=',')
 		for row in reader :
 			filedata.append(row)
 
+	min_keyword_num = 20
+	if args.light:
+		min_keyword_num = 40
 
 	# Fetch keyword data
 	trained_data = {}
-	trained_data['keywords'] = fetch_keywords(filedata)
+	trained_data['keywords'] = fetch_keywords(filedata, min_keyword_num)
 	trained_data['patterns'] = match_patterns(filedata)
 
 	# Save result
-	with open(result_file, 'w') as file :
-		file.write( json.dumps(trained_data) )
+	with gzip.open(args.model_path, 'wb') as f:
+		f.write(json.dumps(trained_data).encode())
 
-	print('Trained result is saved at "%s"' % result_file)
+	print('Trained model is saved at "%s"' % args.model_path)
 
 
-def fetch_keywords(codedata) :
+def fetch_keywords(codedata, min_keyword_num = 20) :
 	""" Fetch keywords by shaman.KeywordFetcher
 		Get average probabilities of keyword and language
 	"""
-
+	lang_cnt = {}
+	lk_cnt = {} # [language][keyword] = count
 	# Read row in codedata and count keywords in codes with langauge
-	tmp = {}
-	language_counts = {}
-
-	for index, (language, code) in enumerate(codedata) :
-		if language not in shaman.LANGUAGES_SUPPORTED :
+	for index, (language, code) in enumerate(codedata):
+		if language not in shaman.LANGUAGES_SUPPORTED:
 			continue
 
-		if language not in tmp :
-			tmp[language] = {}
-			language_counts[language] = 0
+		if language not in lk_cnt:
+			lk_cnt[language] = {}
+			lang_cnt[language] = 0
 
-		language_counts[language] += 1
+		lang_cnt[language] += 1
 
-		for keyword in shaman.KeywordFetcher.fetch( code ) :
+		for keyword in shaman.KeywordFetcher.fetch( code ):
 			# if keyword exists in fetched data, add '1' to keyword data
-			tmp[language][keyword] = tmp[language].get(keyword, 0) + 1
+			lk_cnt[language][keyword] = lk_cnt[language].get(keyword, 0) + 1
 
 		print('Fetch keyword %d/%d    ' % (index, len(codedata)), end='\r')
 
-
 	# Get dataset indexed by keyword
 	ret = {}
-
-	for language in tmp :
-		for keyword, count in tmp[ language ].items() :	
+	for language in lk_cnt:
+		for keyword, count in lk_cnt[language].items() :
 			if keyword not in ret :
 				ret[keyword] = {}
 
-			ret[keyword][language] = (count / language_counts[ language ]) # Probability
+			ret[keyword][language] = (count / lang_cnt[ language ]) # Probability
+			ret[keyword]['$$total'] = ret[keyword].get('$$total', 0) + count
 
-			if ZIP_RESULT:
-				ret[keyword]['$$total'] = ret[keyword].get('$$total', 0) + count
 
-	if ZIP_RESULT:
-		# If ZIP_RESULT is true, check total counts of the keyword,
-		# and ignore if count is too small (under 30)
-		keywords2remove = []
+	# Check total counts of the keyword and ignore if count is too small
+	# (threshold is determined by `min_keyword_num`)
+	keywords2remove = []
 
-		for keyword in ret:
-			if ret[keyword]['$$total'] < 30:
-				keywords2remove.append(keyword)
-				continue
-			del ret[keyword]['$$total']
+	for keyword in ret:
+		if ret[keyword]['$$total'] < min_keyword_num:
+			keywords2remove.append(keyword)
+			continue
+		del ret[keyword]['$$total']
 
-		for keyword in keywords2remove:
-			del ret[keyword]
+	for keyword in keywords2remove:
+		del ret[keyword]
 
 	print('Fetch keyword completed        ')
 	return ret
-
 
 
 def match_patterns(codedata) :
@@ -125,20 +109,19 @@ def match_patterns(codedata) :
 
 	ret = {}
 
-	for index1, pattern in enumerate(shaman.PatternMatcher.PATTERNS) :
+	for index1, pattern in enumerate(shaman.PatternMatcher.PATTERNS):
 		print('Matching pattern %d "%s"' % (index1+1, pattern))
 
 		matcher = shaman.PatternMatcher(pattern)
 		tmp = {}
 
-		for index2, (language, code) in enumerate(codedata) :
-			if language not in shaman.SUPPORTING_LANGUAGES :
+		for index2, (language, code) in enumerate(codedata):
+			if language not in shaman.LANGUAGES_SUPPORTED:
+				continue
+			if len(code) <= 20 or len(code) > 100000:
 				continue
 
-			if len(code) <= 20 or len(code) > 100000 :
-				continue
-
-			if language not in tmp :
+			if language not in tmp:
 				tmp[language] = []
 
 			ratio = matcher.getratio(code)
@@ -146,12 +129,12 @@ def match_patterns(codedata) :
 
 			print('Matching patterns %d/%d    ' % (index2, len(codedata)), end='\r')
 
-
 		ret[pattern] = {}
-		for language, data in tmp.items() :
+		for language, data in tmp.items():
 			ret[pattern][language] = sum(tmp[language]) / max(len(tmp[language]), 1)
 
 	print('Matching patterns completed          ')
 	return ret
 
-run()
+if __name__ == '__main__':
+	main(args)

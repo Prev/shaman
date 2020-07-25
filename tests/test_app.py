@@ -1,6 +1,5 @@
 from shamanld import Shaman
 
-
 def test_detection1() :
 	code = """#include <stdio.h>
 	int main() {
@@ -10,8 +9,6 @@ def test_detection1() :
 
 	r = Shaman.default().detect(code)
 	assert r[0][0] == 'c'
-
-
 
 def test_detection2() :
 	code = """<!doctype>

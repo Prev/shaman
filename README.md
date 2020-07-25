@@ -6,13 +6,26 @@
 Programming Language Detector  
 When you input `code`, Shaman detect its `language`.
 
-## Install
+Languages supported:
+`ASP`, `Bash`, `C`, `C#`, `CSS`, `HTML`, `Java`, `JavaScript`, `JSP`,
+`Objective-c`, `PHP`, `Python`, `Ruby`, `SQL`, `Swift`, and `XML`.
+
+Base on Naïve Bayes Classification, and extra techniques including pattern matching are included.
+Pre-trained model is included in the library. Size of the model is only **248KB**.
+
+Included model has test accuracy is 74% while training accuracy is 80%
+in which it is trained with 100K codes and tested with 40K codes.
+
+
+## Getting Started
+
+### How to install
 
 ```bash
 $ pip install shamanld
 ```
 
-## Usage
+### How to use
 
 ```python
 from shamanld import Shaman
@@ -27,54 +40,40 @@ int main() {
 r = Shaman.default().detect(code)
 
 print(r)
-# [('c', 44.54114006995534), ('java', 6.445867604204304), ('c#', 5.015724434781431), ...]
+# [('c', 38.27568605456699), ('objective-c', 8.802419110662512), ('java', 7.5835661834984585), ...]
 ```
 
-## Languages supported
 
-ASP, Bash, C, C#, CSS, , HTML, Java, JavaScript, JSP,
-Objective-c, PHP, Python, Ruby, SQL, Swift, and XML.
+## Test and train with your custom dataset
 
+Shaman supports training the model with your custom dataset easily.
+Only thing you have to prepare is to make your dataset with CSV format.
+CSV file should includes "language,code" pairs.
 
-## Accuracy
-
-~80%  
-
-<img src="https://raw.githubusercontent.com/Prev/shaman/master/resources/accuracy.png" width="500" alt="Accuracy">
-
-## Test shaman using CLI
-
-#### Test single file
+#### Test with custom dataset
 
 ```bash
-$ shaman-tester -f sample1.cpp
-c: 99.98%
-c#: 0.02%
-java: 0.00%
-javascript: 0.00%
+$ shaman-tester codes.csv
 ```
 
-#### Test bunch of code
+### Training a new model with custom dataset
+
 ```bash
-$ shaman-tester -b codes.csv
-# CSV format: language, code
+$ shaman-trainer codes.csv path/to/your_model.json.gz
 ```
 
+### Testing custom model
 
-## Using custom trained set
-
-#### Make custom trained set
 ```bash
-$ shaman-trainer code_bunch.csv custom_trained_set.json
-# CSV format: language, code
+$ shaman-trainer codes_val.csv path/to/your_model.json.gz
 ```
 
-#### Use custom trained set
+### Using custom model on the code
 ```python
 from shamanld import Shaman
 
-detector = Shaman(open('custom_trained_set.json'))
-detector.detect('some code')
+detector = Shaman('path/to/your_model.json.gz'))
+detector.detect('/* some code */')
 ```
 
 ## JavaScript version
