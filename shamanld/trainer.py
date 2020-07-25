@@ -70,7 +70,7 @@ def fetch_keywords(codedata) :
 	language_counts = {}
 
 	for index, (language, code) in enumerate(codedata) :
-		if language not in shaman.SUPPORTING_LANGUAGES :
+		if language not in shaman.LANGUAGES_SUPPORTED :
 			continue
 
 		if language not in tmp :

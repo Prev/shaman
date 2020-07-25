@@ -7,7 +7,7 @@
 	:license: MIT
 """
 
-SUPPORTING_LANGUAGES = ('actionscript', 'asp', 'bash', 'c', 'c#', 'css', 'haxe', 'html', 'java', 'javascript', 'jsp', 'objective-c', 'perl', 'php', 'python', 'ruby', 'sql', 'swift', 'visualbasic', 'xml')
+LANGUAGES_SUPPORTED = ('asp', 'bash', 'c', 'c#', 'css', 'html', 'java', 'javascript', 'jsp', 'objective-c', 'php', 'python', 'ruby', 'sql', 'swift', 'xml')
 
 import os, json
 import re

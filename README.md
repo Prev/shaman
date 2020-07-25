@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/Prev/shaman.svg)](https://travis-ci.org/Prev/shaman) 
 
 Programming Language Detector  
-When you input `code`, Shaman detect its `language`
+When you input `code`, Shaman detect its `language`.
 
 ## Install
 
@@ -30,36 +30,22 @@ print(r)
 # [('c', 44.54114006995534), ('java', 6.445867604204304), ('c#', 5.015724434781431), ...]
 ```
 
-## Supporting languages
+## Languages supported
 
-- ActionScript
-- ASP
-- Bash
-- C
-- C#
-- CSS
-- HaXe
-- HTML
-- Java
-- JavaScript
-- JSP
-- Objective-c
-- Perl
-- PHP
-- Python
-- Ruby
-- SQL
-- Swift
-- VisualBasic
-- XML
+ASP, Bash, C, C#, CSS, , HTML, Java, JavaScript, JSP,
+Objective-c, PHP, Python, Ruby, SQL, Swift, and XML.
 
 
 ## Accuracy
-Now 80%  
+
+~80%  
+
 <img src="https://raw.githubusercontent.com/Prev/shaman/master/resources/accuracy.png" width="500" alt="Accuracy">
 
-## Test shaman
+## Test shaman using CLI
+
 #### Test single file
+
 ```bash
 $ shaman-tester -f sample1.cpp
 c: 99.98%
@@ -75,7 +61,8 @@ $ shaman-tester -b codes.csv
 ```
 
 
-## Custom trained set
+## Using custom trained set
+
 #### Make custom trained set
 ```bash
 $ shaman-trainer code_bunch.csv custom_trained_set.json
@@ -89,3 +76,9 @@ from shamanld import Shaman
 detector = Shaman(open('custom_trained_set.json'))
 detector.detect('some code')
 ```
+
+## JavaScript version
+
+JavaScript **inferencing** implementation is available at [Prev/shamanjs](https://github.com/Prev/shamanjs). (Note: training is not available in JS version)
+
+

@@ -87,7 +87,7 @@ def test_with_bunch(filename) :
 	for index, (language, code) in enumerate(filedata) :
 		print ('Testing %s/%s     ' % (index, len(filedata)), end="\r")
 
-		if language not in shaman.SUPPORTING_LANGUAGES:
+		if language not in shaman.LANGUAGES_SUPPORTED:
 			totals -= 1
 			continue
 
