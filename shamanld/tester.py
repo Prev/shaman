@@ -2,13 +2,13 @@
 Accuracy tester of Shaman
 
 Usage:
-	python tester.py <test_set.csv> [--model-path <model_path>]
+	shaman-tester <test_set.csv> [--model-path <model_path>]
 
 :author: Prev(prevdev@gmail.com)
 :license: MIT
 """
 
-from shaman import Shaman, LANGUAGES_SUPPORTED
+from . import shaman
 import sys, os
 import csv, json
 import argparse
@@ -25,9 +25,9 @@ def main() :
 
 	if args.model_path:
 		print('Use model on %s' % args.model_path)
-		detector = Shaman(args.model_path)
+		detector = shaman.Shaman(args.model_path)
 	else:
-		detector = Shaman.default()
+		detector = shaman.Shaman.default()
 	test_with_bunch(args.path, detector)
 
 def test_with_bunch(filepath, detector) :
@@ -51,7 +51,7 @@ def test_with_bunch(filepath, detector) :
 	for index, (language, code) in enumerate(filedata) :
 		print ('Testing %s/%s     ' % (index, len(filedata)), end="\r")
 
-		if language not in LANGUAGES_SUPPORTED:
+		if language not in shaman.LANGUAGES_SUPPORTED:
 			totals -= 1
 			continue
 		if language not in results:

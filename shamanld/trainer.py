@@ -2,12 +2,12 @@
 Train Shaman with CSV file ("language, code" foramt)
 
 Usage:
-	python trainer.py <test_set.csv> [--model-path <output_model_path>] [--light]
+	shaman-trainer <test_set.csv> [--model-path <output_model_path>] [--light]
 
 :author: Prev(prevdev@gmail.com)
 :license: MIT
 """
-import shaman
+from . import shaman
 import argparse
 import sys
 import os
