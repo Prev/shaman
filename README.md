@@ -1,18 +1,31 @@
-# Shaman
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ratchetcloud/powerforums/blob/master/LICENSE)
 [![Pypi](https://img.shields.io/pypi/v/shamanld.svg)](https://pypi.python.org/pypi/shamanld)
 [![Build Status](https://travis-ci.org/Prev/shaman.svg)](https://travis-ci.org/Prev/shaman) 
 
-Programming Language Detector  
-When you input `code`, Shaman detect its `language`
+# Shaman - Programming Language Detector
 
-## Install
+When you input `code`, Shaman detect its `language`.
+
+Languages supported:
+`ASP`, `Bash`, `C`, `C#`, `CSS`, `HTML`, `Java`, `JavaScript`, `JSP`,
+`Objective-c`, `PHP`, `Python`, `Ruby`, `SQL`, `Swift`, and `XML`.
+
+Implemented base on Naïve Bayes Classification and pre-defined pattern matching.
+Pre-trained model is included in the library, where the size of the model is only **248KB**.
+
+The accuracy of the included model is about 75% with the test set and 80% with the training set.
+I trained the model with 100K codes and tested with 40K codes.
+
+
+## Getting Started
+
+#### How to install
 
 ```bash
 $ pip install shamanld
 ```
 
-## Usage
+#### How to use
 
 ```python
 from shamanld import Shaman
@@ -27,65 +40,44 @@ int main() {
 r = Shaman.default().detect(code)
 
 print(r)
-# [('c', 44.54114006995534), ('java', 6.445867604204304), ('c#', 5.015724434781431), ...]
+# [('c', 38.27568605456699), ('objective-c', 8.802419110662512), ('java', 7.5835661834984585), ...]
 ```
 
-## Supporting languages
 
-- ActionScript
-- ASP
-- Bash
-- C
-- C#
-- CSS
-- HaXe
-- HTML
-- Java
-- JavaScript
-- JSP
-- Objective-c
-- Perl
-- PHP
-- Python
-- Ruby
-- SQL
-- Swift
-- VisualBasic
-- XML
+## Test and train with your custom dataset
 
+Shaman supports training the model with your custom dataset easily.
+The only thing you have to prepare is to make your dataset with CSV format.
+CSV file should includes "language,code" pairs.
 
-## Accuracy
-Now 80%  
-<img src="https://raw.githubusercontent.com/Prev/shaman/master/resources/accuracy.png" width="500" alt="Accuracy">
+#### Test with custom dataset
 
-## Test shaman
-#### Test single file
 ```bash
-$ shaman-tester -f sample1.cpp
-c: 99.98%
-c#: 0.02%
-java: 0.00%
-javascript: 0.00%
+$ shaman-tester path/to/test_set.csv
 ```
 
-#### Test bunch of code
+#### Training a new model with custom dataset
+
 ```bash
-$ shaman-tester -b codes.csv
-# CSV format: language, code
+$ shaman-trainer path/to/training_set.csv path/to/your_model.json.gz
 ```
 
+#### Testing custom model
 
-## Custom trained set
-#### Make custom trained set
 ```bash
-$ shaman-trainer code_bunch.csv custom_trained_set.json
-# CSV format: language, code
+$ shaman-trainer path/to/test_set.csv path/to/your_model.json.gz
 ```
 
-#### Use custom trained set
+#### Using custom model on the code
 ```python
 from shamanld import Shaman
 
-detector = Shaman(open('custom_trained_set.json'))
-detector.detect('some code')
+detector = Shaman('path/to/your_model.json.gz')
+detector.detect('/* some code */')
 ```
+
+## JavaScript version
+
+JavaScript **inferencing** implementation is available at [Prev/shamanjs](https://github.com/Prev/shamanjs). (Note: training is not available in JS version)
+
+

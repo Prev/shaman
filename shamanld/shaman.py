@@ -1,17 +1,29 @@
 """
-	shaman/shaman
-	-----------------
-	Programming Language Detector
+Programming Language Detector
 
-	:author: Prev(prevdev@gmail.com)
-	:license: MIT
+Usage
+----------------
+from shamanld import Shaman
+Shaman.default().detect(\"""
+#include <stdio.h>
+int main() {
+	printf("Hello world");
+}
+\""")
+# [('c', 44.54114006995534), ('java', 6.445867604204304), ('c#', 5.015724434781431), ...]
+
+:author: Prev(prevdev@gmail.com)
+:license: MIT
 """
 
-SUPPORTING_LANGUAGES = ('actionscript', 'asp', 'bash', 'c', 'c#', 'css', 'haxe', 'html', 'java', 'javascript', 'jsp', 'objective-c', 'perl', 'php', 'python', 'ruby', 'sql', 'swift', 'visualbasic', 'xml')
+LANGUAGES_SUPPORTED = ('asp', 'bash', 'c', 'c#', 'css', 'html', 'java', 'javascript', 'jsp',
+                       'objective-c', 'php', 'python', 'ruby', 'sql', 'swift', 'xml')
 
-import os, json
+import os
+import json
 import re
 import math
+import gzip
 
 class Shaman :
 
@@ -24,68 +36,68 @@ class Shaman :
 		if Shaman._default_instance is not None :
 			return Shaman._default_instance
 
-		with open((os.path.dirname(__file__) or '.') + '/data/trained.json') as file :
-			tset = json.loads(file.read())
-
-		Shaman._default_instance = Shaman(tset)
+		here = (os.path.dirname(__file__) or '.')
+		Shaman._default_instance = Shaman(here + '/data/model.json.gz')
 		return Shaman._default_instance
 
-
-	def __init__(self, trained_set) :
+	def __init__(self, model_path) :
 		""" Shaman constructor
 		"""
-		if hasattr(trained_set, 'read') :
-			trained_set = json.loads(trained_set.read())
+		ext = model_path.split('.')[-1]
+		if ext == 'json':
+			with open(model_path) as file:
+				self.model = json.loads(file.read())
 
-		self.trained_set = trained_set
+		elif ext == 'gz':
+			with gzip.open(model_path, 'rb') as f:
+				self.model = json.loads(f.read().decode())
 
+		else:
+			raise Exception('Unsupported file extension %s. Try using a model with .json or .json.gz file')
 
 	def detect(self, code) :
 		""" Detect language with code
 		"""
-		
-		keywords = KeywordFetcher.fetch( code )
+		keywords = KeywordFetcher.fetch(code)
 		probabilities = {}
 
 		for keyword in keywords :
-			if keyword not in self.trained_set['keywords'] :
+			if keyword not in self.model['keywords']:
 				continue
 
-			data = self.trained_set['keywords'][keyword]
+			data = self.model['keywords'][keyword]
 			p_avg = sum(data.values()) / len(data) # Average probability of all languages
 
-			for language, probability in data.items() :
+			for language, probability in data.items():
 				# By Naïve Bayes Classification
 				p = probability / p_avg
 
-				probabilities[ language ] = probabilities.get(language, 0) + math.log(1 + p)
+				probabilities[language] = probabilities.get(language, 0) + math.log(1 + p)
 
-
-		for pattern, data in self.trained_set['patterns'].items() :
+		for pattern, data in self.model['patterns'].items():
 			matcher = PatternMatcher(pattern)
 			p0 = matcher.getratio(code)
-			
-			for language, p_avg in data.items() :
-				if language not in probabilities :
+
+			for language, p_avg in data.items():
+				if language not in probabilities:
 					continue
 
 				p = 1 - abs(p_avg - p0)
-				probabilities[ language ] *= p
-				
+				probabilities[language] *= p
 
 		# Convert `log` operated probability to percentile
 		sum_val = 0
-		for language, p in probabilities.items() :
+		for language, p in probabilities.items():
 			sum_val += math.pow(math.e / 2, p)
 
-		for language, p in probabilities.items() :
+		for language, p in probabilities.items():
 			probabilities[language] = math.pow(math.e / 2, p) / sum_val * 100
 
 		return sorted(probabilities.items(), key=lambda a: a[1], reverse=True)
 
 
 class KeywordFetcher :
-	
+
 	prog = re.compile('([a-zA-Z0-9$*#@_-]+)')
 
 	@staticmethod
@@ -97,7 +109,7 @@ class KeywordFetcher :
 		code = KeywordFetcher._remove_strings(code)
 		result = KeywordFetcher.prog.findall(code)
 
-		for keyword in result :
+		for keyword in result:
 			if len(keyword) <= 1: continue # Ignore single-length word
 			if keyword.isdigit(): continue # Ignore number
 
@@ -106,10 +118,9 @@ class KeywordFetcher :
 
 			if len(keyword) <= 1: continue
 
-			ret[ keyword ] = ret.get(keyword, 0) + 1 # `ret[ keyword ] += 1` with initial value
+			ret[keyword] = ret.get(keyword, 0) + 1 # `ret[ keyword ] += 1` with initial value
 
 		return ret
-
 
 	@staticmethod
 	def _remove_strings(code) :
@@ -117,35 +128,32 @@ class KeywordFetcher :
 		"""
 		removed_string = ""
 		is_string_now = None
-		
-		for i in range(0, len(code)-1) :
+
+		for i in range(0, len(code)-1):
 			append_this_turn = False
 
-			if code[i] == "'" and (i == 0 or code[i-1] != '\\') :
-				if is_string_now == "'" :
+			if code[i] == "'" and (i == 0 or code[i-1] != '\\'):
+				if is_string_now == "'":
 					is_string_now = None
 
-				elif is_string_now == None :
+				elif is_string_now == None:
 					is_string_now = "'"
 					append_this_turn = True
 
-			elif code[i] == '"' and (i == 0 or code[i-1] != '\\') :
-				if is_string_now == '"' :
+			elif code[i] == '"' and (i == 0 or code[i-1] != '\\'):
+				if is_string_now == '"':
 					is_string_now = None
 
 				elif is_string_now == None :
 					is_string_now = '"'
 					append_this_turn = True
 
-
-			if is_string_now == None or append_this_turn == True :
+			if is_string_now == None or append_this_turn == True:
 				removed_string += code[i]
 
 		return removed_string
 
-
-
-class PatternMatcher :
+class PatternMatcher:
 
 	PATTERNS = [
 		r'(<.+>[^<]*<\/.+>)|<\\?.+>', #markup
@@ -157,18 +165,17 @@ class PatternMatcher :
 		r'\([^)]*\)\s*{[^}]*}', # c-style block
 	]
 
-	def __init__(self, pattern) :
+	def __init__(self, pattern):
 		""" Pattern Matcher Constructor
 		:param pattern: regex pattern string
 		"""
 		self.prog = re.compile(pattern)
 
 
-	def getratio(self, code) :
+	def getratio(self, code):
 		""" Get ratio of code and pattern matched
 		"""
 		if len(code) == 0 : return 0
 
 		code_replaced = self.prog.sub('', code)
 		return (len(code) - len(code_replaced)) / len(code)
-	

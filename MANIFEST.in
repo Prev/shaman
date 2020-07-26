@@ -1,2 +1,2 @@
-include shamanld/data/trained.json
+include shamanld/data/model.json.gz
 recursive-include data *
