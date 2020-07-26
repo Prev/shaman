@@ -3,6 +3,7 @@ Accuracy tester of Shaman
 
 Usage:
 	shaman-tester <test_set.csv> [--model-path <model_path>]
+	python -m shamanld.tester <test_set.csv> [--model-path <model_path>]
 
 :author: Prev(prevdev@gmail.com)
 :license: MIT
@@ -59,10 +60,10 @@ def test_with_bunch(filepath, detector) :
 
 		try :
 			inferenced = detector.detect(code)[0][0]
-		except IndexError :
+		except IndexError:
 			inferenced = None
 
-		if inferenced == language :
+		if inferenced == language:
 			correct += 1
 			results[ language ][0] += 1
 
@@ -74,8 +75,8 @@ def test_with_bunch(filepath, detector) :
 	print('------------------------------------------------')
 
 	results = sorted(results.items(), key=lambda x: x[1][0], reverse=True)
-	for lang, l in results :
+	for lang, l in results:
 		print('%s: %.2lf%% (%s/%s)' % (lang, l[2] * 100, l[0], l[1]))
 
 if __name__ == '__main__':
-	main(args)
+	main()

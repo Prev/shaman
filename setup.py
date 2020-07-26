@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
 	name = 'shamanld',
 	packages = ['shamanld'],
-	version = '1.0.0',
+	version = '1.0.1',
 	description = 'Programming Language Detector',
 	license = 'MIT',
 

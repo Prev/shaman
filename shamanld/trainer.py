@@ -2,7 +2,8 @@
 Train Shaman with CSV file ("language, code" foramt)
 
 Usage:
-	shaman-trainer <test_set.csv> [--model-path <output_model_path>] [--light]
+	shaman-trainer <trainer_set.csv> [--model-path <output_model_path>] [--light]
+	python -m shamanld.trainer <trainer_set.csv> [--model-path <output_model_path>] [--light]
 
 :author: Prev(prevdev@gmail.com)
 :license: MIT
@@ -137,4 +138,4 @@ def match_patterns(codedata) :
 	return ret
 
 if __name__ == '__main__':
-	main(args)
+	main()
