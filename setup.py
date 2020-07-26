@@ -10,7 +10,7 @@ setup(
 	long_description=long_description,
     long_description_content_type='text/markdown',
 	packages = ['shamanld'],
-	version = '1.0.2',
+	version = '1.1.0',
 	description = 'Programming Language Detector',
 	license = 'MIT',
 

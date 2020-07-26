@@ -10,3 +10,4 @@ install:
 
 script:
   - python -m pytest tests
+  - pylint shamanld

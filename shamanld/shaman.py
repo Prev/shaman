@@ -2,7 +2,7 @@
 Programming Language Detector
 
 Usage
-----------------
+-------------------------------
 from shamanld import Shaman
 Shaman.default().detect(\"""
 #include <stdio.h>
@@ -12,12 +12,24 @@ int main() {
 \""")
 # [('c', 44.54114006995534), ('java', 6.445867604204304), ('c#', 5.015724434781431), ...]
 
+Model format
+-------------------------------
+{
+	"version": "...",
+	"languages": ["asp", "bash", "c", ...],
+	"keywords": {
+		"printf": [0, 0.001, 0.81321, ...],
+		"...": [...],
+	},
+	"patterns": {
+		"(<.+>[^<]*</.+>)|<\\?.+>": [0.131, 0.532, 0.512, ...],
+		"...": [...],
+	}
+}
+
 :author: Prev(prevdev@gmail.com)
 :license: MIT
 """
-
-LANGUAGES_SUPPORTED = ('asp', 'bash', 'c', 'c#', 'css', 'html', 'java', 'javascript', 'jsp',
-                       'objective-c', 'php', 'python', 'ruby', 'sql', 'swift', 'xml')
 
 import os
 import json
@@ -25,22 +37,27 @@ import re
 import math
 import gzip
 
-class Shaman :
+
+LANGUAGES_SUPPORTED = ('asp', 'bash', 'c', 'c#', 'css', 'html', 'java', 'javascript', 'jsp',
+                       'objective-c', 'php', 'python', 'ruby', 'sql', 'swift', 'xml')
+version = '1.1.0'
+
+class Shaman:
 
 	_default_instance = None
 
 	@staticmethod
-	def default() :
+	def default():
 		""" Get default shaman instance by "data/trained.json"
 		"""
-		if Shaman._default_instance is not None :
+		if Shaman._default_instance is not None:
 			return Shaman._default_instance
 
 		here = (os.path.dirname(__file__) or '.')
 		Shaman._default_instance = Shaman(here + '/data/model.json.gz')
 		return Shaman._default_instance
 
-	def __init__(self, model_path) :
+	def __init__(self, model_path):
 		""" Shaman constructor
 		"""
 		ext = model_path.split('.')[-1]
@@ -55,30 +72,33 @@ class Shaman :
 		else:
 			raise Exception('Unsupported file extension %s. Try using a model with .json or .json.gz file')
 
-	def detect(self, code) :
+	def detect(self, code):
 		""" Detect language with code
 		"""
 		keywords = KeywordFetcher.fetch(code)
 		probabilities = {}
 
-		for keyword in keywords :
+		for keyword in keywords:
 			if keyword not in self.model['keywords']:
 				continue
 
 			data = self.model['keywords'][keyword]
-			p_avg = sum(data.values()) / len(data) # Average probability of all languages
+			p_avg = sum(data) / len(data) # Average probability of all languages
 
-			for language, probability in data.items():
+			for lang_id, probability in enumerate(data):
 				# By Naïve Bayes Classification
 				p = probability / p_avg
 
+				# verbose language is defined in `languages` field of the model
+				language = self.model['languages'][lang_id]
 				probabilities[language] = probabilities.get(language, 0) + math.log(1 + p)
 
 		for pattern, data in self.model['patterns'].items():
 			matcher = PatternMatcher(pattern)
 			p0 = matcher.getratio(code)
 
-			for language, p_avg in data.items():
+			for lang_id, p_avg in enumerate(data):
+				language = self.model['languages'][lang_id]
 				if language not in probabilities:
 					continue
 
@@ -95,13 +115,12 @@ class Shaman :
 
 		return sorted(probabilities.items(), key=lambda a: a[1], reverse=True)
 
-
-class KeywordFetcher :
+class KeywordFetcher:
 
 	prog = re.compile('([a-zA-Z0-9$*#@_-]+)')
 
 	@staticmethod
-	def fetch(code) :
+	def fetch(code):
 		""" Fetch keywords by Code
 		"""
 		ret = {}
@@ -110,20 +129,33 @@ class KeywordFetcher :
 		result = KeywordFetcher.prog.findall(code)
 
 		for keyword in result:
-			if len(keyword) <= 1: continue # Ignore single-length word
-			if keyword.isdigit(): continue # Ignore number
+			if len(keyword) <= 1:
+				# Ignore single-length word
+				continue
+			if len(keyword) >= 30:
+				# Ignore too-long word
+				continue
+			if keyword.isdigit():
+				# Ignore number
+				continue
 
-			if keyword[0] == '-' or keyword[0] == '*' : keyword = keyword[1:] # Remove first char if string is starting by '-' or '*' (Pointer or Negative numbers)
-			if keyword[-1] == '-' or keyword[-1] == '*' : keyword = keyword[0:-1] # Remove last char if string is finished by '-' or '*'
+			# Remove first char if string is starting by '-' or '*' (Pointer or Negative numbers)
+			if keyword[0] == '-' or keyword[0] == '*':
+				keyword = keyword[1:]
 
-			if len(keyword) <= 1: continue
+			# Remove last char if string is finished by '-' or '*'
+			if keyword[-1] == '-' or keyword[-1] == '*':
+				keyword = keyword[0:-1]
+
+			if len(keyword) <= 1:
+				continue
 
 			ret[keyword] = ret.get(keyword, 0) + 1 # `ret[ keyword ] += 1` with initial value
 
 		return ret
 
 	@staticmethod
-	def _remove_strings(code) :
+	def _remove_strings(code):
 		""" Remove strings in code
 		"""
 		removed_string = ""
@@ -136,7 +168,7 @@ class KeywordFetcher :
 				if is_string_now == "'":
 					is_string_now = None
 
-				elif is_string_now == None:
+				elif is_string_now is None:
 					is_string_now = "'"
 					append_this_turn = True
 
@@ -144,11 +176,11 @@ class KeywordFetcher :
 				if is_string_now == '"':
 					is_string_now = None
 
-				elif is_string_now == None :
+				elif is_string_now is None:
 					is_string_now = '"'
 					append_this_turn = True
 
-			if is_string_now == None or append_this_turn == True:
+			if is_string_now is None or append_this_turn:
 				removed_string += code[i]
 
 		return removed_string
@@ -156,7 +188,7 @@ class KeywordFetcher :
 class PatternMatcher:
 
 	PATTERNS = [
-		r'(<.+>[^<]*<\/.+>)|<\\?.+>', #markup
+		r'(<.+>[^<]*</.+>)|<\\?.+>', #markup
 		r'([a-zA-Z0-9-_]+)\s*:\s*.*\s*;', #css
 		r'def\s+([^(]+)\s*\([^)]*\)\s*:', #python
 		r'function\s+\([^)]*\)\s*{[^}]*}', #js-style function
@@ -171,11 +203,11 @@ class PatternMatcher:
 		"""
 		self.prog = re.compile(pattern)
 
-
 	def getratio(self, code):
 		""" Get ratio of code and pattern matched
 		"""
-		if len(code) == 0 : return 0
+		if len(code) == 0:
+			return 0
 
 		code_replaced = self.prog.sub('', code)
 		return (len(code) - len(code_replaced)) / len(code)

@@ -11,10 +11,10 @@ Languages supported:
 `Objective-c`, `PHP`, `Python`, `Ruby`, `SQL`, `Swift`, and `XML`.
 
 Implemented base on Naïve Bayes Classification and pre-defined pattern matching.
-Pre-trained model is included in the library, where the size of the model is only **248KB**.
+Pre-trained model is included in the library, where the size of the model is only **167KB**.
 
-The accuracy of the included model is about 75% with the test set and 80% with the training set.
-I trained the model with 100K codes and tested with 40K codes.
+The accuracy of the included model is about **75%** with the test set and 80% with the training set.
+The model is trained with 100K codes and tested with 40K codes.
 
 
 ## Getting Started
@@ -78,6 +78,5 @@ detector.detect('/* some code */')
 
 ## JavaScript version
 
-JavaScript **inferencing** implementation is available at [Prev/shamanjs](https://github.com/Prev/shamanjs). (Note: training is not available in JS version)
-
+JavaScript **inferencing** implementation is available at [Prev/shamanjs](https://github.com/Prev/shamanjs).
 
