@@ -206,7 +206,7 @@ class PatternMatcher:
 	def getratio(self, code):
 		""" Get ratio of code and pattern matched
 		"""
-		if len(code) == 0:
+		if code == '':
 			return 0
 
 		code_replaced = self.prog.sub('', code)
