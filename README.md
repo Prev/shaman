@@ -10,7 +10,7 @@ Languages supported:
 `ASP`, `Bash`, `C`, `C#`, `CSS`, `HTML`, `Java`, `JavaScript`, `JSP`,
 `Objective-c`, `PHP`, `Python`, `Ruby`, `SQL`, `Swift`, and `XML`.
 
-Implemented base on Naïve Bayes Classification and pre-defined pattern matching.
+Shaman is implemented base on Naïve Bayes Classification and pattern matching technique.
 Pre-trained model is included in the library, where the size of the model is only **167KB**.
 
 The accuracy of the included model is about **75%** with the test set and 80% with the training set.
@@ -40,7 +40,7 @@ int main() {
 r = Shaman.default().detect(code)
 
 print(r)
-# [('c', 38.27568605456699), ('objective-c', 8.802419110662512), ('java', 7.5835661834984585), ...]
+# [('c', 42.60959840702781), ('objective-c', 8.535893087527496), ('java', 7.237626324587697), ...]
 ```
 
 
@@ -59,13 +59,13 @@ $ shaman-tester path/to/test_set.csv
 #### Training a new model with custom dataset
 
 ```bash
-$ shaman-trainer path/to/training_set.csv path/to/your_model.json.gz
+$ shaman-trainer path/to/training_set.csv --model-path path/to/your_model.json.gz
 ```
 
 #### Testing custom model
 
 ```bash
-$ shaman-trainer path/to/test_set.csv path/to/your_model.json.gz
+$ shaman-trainer path/to/test_set.csv --model-path path/to/your_model.json.gz
 ```
 
 #### Using custom model on the code
