@@ -54,9 +54,10 @@ def test_with_bunch(filepath, detector):
 	for index, (language, code) in enumerate(filedata):
 		print('Testing %s/%s     ' % (index, len(filedata)), end="\r")
 
-		if language not in shaman.LANGUAGES_SUPPORTED:
+		if language not in detector.model['languages']:
 			totals -= 1
 			continue
+
 		if language not in results:
 			results[language] = [0, 0, 0]
 
@@ -72,13 +73,29 @@ def test_with_bunch(filepath, detector):
 		results[language][1] += 1
 		results[language][2] = results[language][0] / results[language][1]
 
-	print('------------------------------------------------')
-	print('Accuracy: %.2lf%% (%d / %d)' % (correct/totals*100, correct, totals))
-	print('------------------------------------------------')
+	print('| Language     | Accuracy                  |')
+	print('|--------------|---------------------------|')
+	print_table_row(
+		'Total',
+		'%.2lf%% (%d / %d)' % (correct / totals * 100, correct, totals),
+		12,
+		25,
+	)
 
 	results = sorted(results.items(), key=lambda x: x[1][0], reverse=True)
 	for lang, l in results:
-		print('%s: %.2lf%% (%s/%s)' % (lang, l[2] * 100, l[0], l[1]))
+		print_table_row(
+			lang,
+			'%.2lf%% (%d / %d)' % (l[2] * 100, l[0], l[1]),
+			12,
+			25,
+		)
+
+def print_table_row(col1, col2, col1_len, col2_len):
+	col1 += ' ' * (col1_len - len(col1))
+	col2 += ' ' * (col2_len - len(col2))
+
+	print('| %s | %s |' % (col1, col2))
 
 if __name__ == '__main__':
 	main()

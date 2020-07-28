@@ -38,7 +38,7 @@ import math
 import gzip
 
 
-LANGUAGES_SUPPORTED = ('asp', 'bash', 'c', 'c#', 'css', 'html', 'java', 'javascript', 'jsp',
+LANGUAGES_SUPPORTED = ('asp', 'bash', 'c', 'c#', 'css', 'html', 'java', 'javascript',
                        'objective-c', 'php', 'python', 'ruby', 'sql', 'swift', 'xml')
 version = '1.1.0'
 

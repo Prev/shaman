@@ -70,6 +70,7 @@ def main():
 	model['keywords'] = fetch_keywords(training_data, num_languages, 40 if args.light else 20)
 	model['patterns'] = match_patterns(training_data, num_languages)
 
+	# Compress model by dropping float precision
 	print('Compress model')
 	_drop_float_precision(model['keywords'], 7)
 	_drop_float_precision(model['patterns'], 7)
