@@ -4,9 +4,11 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
+  - "3.8"
 install:
   - pip install .
   - pip install -r test-requirements.txt
 
 script:
   - python -m pytest tests
+  - pylint --rcfile=.pylintrc shamanld
