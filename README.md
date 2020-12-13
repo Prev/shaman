@@ -10,8 +10,8 @@ Languages supported:
 `ASP`, `Bash`, `C`, `C#`, `CSS`, `HTML`, `Java`, `JavaScript`,
 `Objective-c`, `PHP`, `Python`, `Ruby`, `SQL`, `Swift`, and `XML`.
 
-Shaman is implemented base on Naïve Bayes Classification and pattern matching technique.
-Pre-trained model is included in the library, where the size of the model is only **214KB**.
+Shaman is implemented with Bayes Classification and pre-defined RegEx patterns.
+Pre-trained model is included in the library, where the size of the model is **214KB**.
 
 The accuracy of the included model is **78%** with the test set and 83% with the training set.
 See accuracy section for detail.
@@ -48,7 +48,7 @@ print(r)
 
 Shaman supports training the model with your custom dataset easily.
 The only thing you have to prepare is to make your dataset with CSV format.
-CSV file should includes "language,code" pairs.
+CSV file should include "language,code" pairs.
 
 #### Test with custom dataset
 
