@@ -102,5 +102,5 @@ Only the codes whose lengths are more than 100 are used in both training & testi
 
 ## JavaScript version
 
-JavaScript **inferencing** implementation is available at [Prev/shamanjs](https://github.com/Prev/shamanjs).
+JavaScript **inference** implementation is available at [Prev/shamanjs](https://github.com/Prev/shamanjs).
 
