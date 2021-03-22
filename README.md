@@ -33,7 +33,7 @@ from shamanld import Shaman
 code = """
 #include <stdio.h>
 int main() {
-	printf("Hello world");
+    printf("Hello world");
 }
 """
 
