@@ -4,7 +4,7 @@
 
 # Shaman - Programming Language Detector
 
-When you input `code`, Shaman detect its `language`.
+When you input `code`, Shaman detects its `language`.
 
 Languages supported:
 `ASP`, `Bash`, `C`, `C#`, `CSS`, `HTML`, `Java`, `JavaScript`,
@@ -14,7 +14,7 @@ Shaman is implemented with Bayes Classification and pre-defined RegEx patterns.
 Pre-trained model is included in the library, where the size of the model is **214KB**.
 
 The accuracy of the included model is **78%** with the test set and 83% with the training set.
-See accuracy section for detail.
+See [accuracy section](#accuracy) for detail.
 
 
 ## Getting Started
@@ -76,7 +76,7 @@ detector = Shaman('path/to/your_model.json.gz')
 detector.detect('/* some code */')
 ```
 
-## Test accuracy
+## Accuracy
 
 Included model is trained with 120K codes and tested with 42K codes.
 Only the codes whose lengths are more than 100 are used in both training & testing. As the codes are collected without verification, there might be some data with wrong labels.
